@@ -1,1 +1,26 @@
-{}
+{
+    "type": "object",
+    "properties": {
+      "emailValidation": {
+        "type": "object",
+        "properties": {
+          "discordID": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": ["string", "null"],
+                "pattern": "^[a-z0-9]+@purdue\\.edu$"
+              },
+              "verified": {
+                "type": "boolean"
+              }
+            },
+            "required": ["email", "verified"]
+          }
+        },
+        "required": ["discordID"]
+      }
+    },
+    "required": ["emailValidation"]
+  }
+  

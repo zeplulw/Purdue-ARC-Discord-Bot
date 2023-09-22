@@ -29,7 +29,6 @@ async def on_ready():
 
 @bot.slash_command(guild_ids=guild_list)
 async def verify(ctx: discord.ApplicationContext):
-    # email regex: ^[a-z0-9]+@purdue\.edu$
     pass
 
 bot.run(os.getenv('BOT_TOKEN'))
