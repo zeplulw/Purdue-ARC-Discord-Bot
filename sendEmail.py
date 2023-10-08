@@ -12,12 +12,13 @@ class EmailSender:
         self.sender_email = sender_email
         self.sender_password = sender_password
 
-    def send_email(self, /, username: str, *, receiver: str, verification_code: str, subject: str ='Purdue ARC Verification'):
+    def send_email(self, *, username: str, receiver: str, verification_code: str, subject: str ='Purdue ARC Verification') -> None:
         
         """
         Send an email.
 
         Args:
+            username (str): The username of the recipient.
             receiver (str): The email address of the recipient.
             verification_code (int): The body of the email message.
             subject (str, optional): The subject of the email (default is "Purdue ARC Verification").
