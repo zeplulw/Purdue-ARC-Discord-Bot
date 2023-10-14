@@ -1,5 +1,3 @@
-*Formatting will be better*
-
 Setup Instructions
 1. Create and populate .env in root directory:
     - EMAIL_ADDRESS: Email Address
@@ -11,8 +9,8 @@ Setup Instructions
     *README won't be more specific until final publish.*
 2. Create virtual environment: `python -m venv <venv_name>`.
 3. Activate venv.
-    - Windows: `./venv/Scripts/Activate.ps1`
-    - Linux: `./venv/bin/activate`.
+    - Windows: `./<venv_name>/Scripts/Activate.ps1`
+    - Linux: `./<venv_name>/bin/activate`.
 4. Set up packages: `pip install -r requirements.txt`.
 5. Run `main.py`: `python main.py`
     - Persistent after terminal close: `nohup python main.py &`

@@ -48,7 +48,7 @@ class VerificationModal(Modal):
             return await interaction.edit_original_response(content=f"Email does not exist within Purdue's directory.")
 
         _verification_code = random.randint(100000, 999999)
-        self.email_sender.send_email(username=interaction.user.name, receiver=self.children[0].value, verification_code=_verification_code)
+        self.email_sender.send_verification_email(username=interaction.user.name, receiver=self.children[0].value, verification_code=_verification_code)
 
         data["emailVerification"][str(interaction.user.id)] = {"email": self.children[0].value, "verified": False, "verificationCode": _verification_code}
 

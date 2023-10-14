@@ -12,7 +12,20 @@ class EmailSender:
         self.sender_email = sender_email
         self.sender_password = sender_password
 
-    def send_email(self, *, username: str, receiver: str, verification_code: str, subject: str ='Purdue ARC Verification') -> None:
+    # Will be used later to generalize sending multiple types of emails
+    #
+    # def __send_email(self, *, receiver: str, subject: str, body: str, body_type: str) -> None:
+    #     msg = MIMEMultipart()
+    #     msg['From'] = self.sender_email
+    #     msg['To'] = receiver
+    #     msg['Subject'] = subject
+    #     msg.attach(MIMEText(body, body_type))
+
+    #     with smtplib.SMTP_SSL(os.getenv('MAIL_SERVER'), 465, context=ssl.create_default_context()) as smtp:
+    #         smtp.login(self.sender_email, self.sender_password)
+    #         smtp.sendmail(self.sender_email, receiver, msg.as_string())
+
+    def send_verification_email(self, *, username: str, receiver: str, verification_code: str, subject: str ='Purdue ARC Verification') -> None:
         
         """
         Send an email.

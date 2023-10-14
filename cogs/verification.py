@@ -2,13 +2,18 @@ import dotenv
 import json
 import os
 import discord
+import datetime
 from discord.ext import commands
 from discord import Option
 from modal import VerificationModal
+from logger import log
 
 dotenv.load_dotenv()
 
 guild_list = os.getenv('GUILD_LIST').split(',')
+
+def getCurrentTime() -> str:
+    return datetime.datetime.now().isoformat()
 
 class Verification(commands.Cog):
 
@@ -16,15 +21,12 @@ class Verification(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(guild_ids=guild_list)
+    @discord.option("verification_code", type=str, description="Verification code recieved in email.", min_length=6, max_length=6, required=False)
     async def verify(
-        self,
-        ctx: discord.ApplicationContext,
-        verification_code: Option(
-            str,
-            description="Verification code recieved in email.",
-            min_length=6,
-            max_length=6,
-            required=False)):
+            self,
+            ctx: discord.ApplicationContext,
+            verification_code: str
+        ):
         
         if not verification_code:
             await ctx.response.send_modal(VerificationModal())
@@ -32,8 +34,6 @@ class Verification(commands.Cog):
         else:
             with open("../db.json") as f:
                 data = json.load(f)
-
-            print(ctx, type(ctx))
 
             if str(ctx.author.id) not in data['emailVerification']:
                 return await ctx.response.send_message(content=f"You are not verified. Please do `/verify` to start the verification process.", ephemeral=True)
@@ -54,12 +54,18 @@ class Verification(commands.Cog):
             await ctx.response.send_message(content=f"Welcome to ARC! You are now verified.")
 
 def setup(bot):
-    print(f"[INFO] Loading {os.path.basename(__file__)} cog.")
-    bot.add_cog(Verification(bot))
-    print(f"[INFO] Loaded {os.path.basename(__file__)} cog.")
-
+    log("info", __name__, f"Loading {os.path.basename(__file__)} cog.")
+    try:
+        bot.add_cog(Verification(bot))
+        log("info", __name__, f"Loaded {os.path.basename(__file__)} cog.")
+    except Exception as e:
+        log("error", __name__, f"Failed to load {os.path.basename(__file__)} cog.")
 
 def teardown(bot):
-    print(f"[INFO] Unloading {os.path.basename(__file__)} cog.")
-    bot.remove_cog(Verification(bot))
-    print(f"[INFO] Unloaded {os.path.basename(__file__)} cog.")
+    log("info", __name__, f"Unloading {os.path.basename(__file__)} cog.")
+    try:
+        bot.remove_cog(Verification(bot))
+        log("info", __name__, f"Unloaded {os.path.basename(__file__)} cog.")
+    except Exception as e:
+        log("error", __name__, f"Failed to unload {os.path.basename(__file__)} cog.")
+    

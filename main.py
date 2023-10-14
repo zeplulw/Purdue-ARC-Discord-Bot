@@ -1,27 +1,27 @@
 import dotenv
-import json
 import os
 import discord
 import datetime
+import atexit
 from discord import Embed
 from discord.ext import commands
 from discord import Option
-from modal import VerificationModal
+from logger import log
 
 # Ensure that working dir is the same as the file dir
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 dotenv.load_dotenv()
 
-bot = commands.Bot()
+bot = commands.Bot(intents=discord.Intents.all())
 guild_list = os.getenv('GUILD_LIST').split(',')
-EMBED_COLOR = hex(int(os.getenv('EMBED_COLOR'), 16))
+EMBED_COLOR = int(os.getenv('EMBED_COLOR'), 16)
 ARC_ICON_URL = os.getenv('ARC_ICON_URL')
 
 # @TODO: add detection for disconnect (MONITORING); add disconnect to log (LOGGING)
 @bot.event
 async def on_ready():
     # @TODO: add ready to log (LOGGING)
-    print(f'[INFO] {bot.user} has successfully connected.')
+    log("info", __name__, f"{bot.user} has logged in and is connected to Discord.")
 
 @bot.slash_command(guild_ids=guild_list)
 async def load(ctx: discord.ApplicationContext, extension: Option(str, description="Extension to load.")):
@@ -38,6 +38,7 @@ async def load(ctx: discord.ApplicationContext, extension: Option(str, descripti
 
     bot.load_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Loaded {extension}.')
+    log("debug", __name__, f"{ctx.author.name} loaded {extension}.")
 
 @bot.slash_command(guild_ids=guild_list)
 async def unload(ctx: discord.ApplicationContext, extension: Option(str, description="Extension to unload.")):
@@ -54,6 +55,7 @@ async def unload(ctx: discord.ApplicationContext, extension: Option(str, descrip
 
     bot.unload_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Unloaded {extension}.')
+    log("debug", __name__, f"{ctx.author.name} unloaded {extension}.")
 
 @bot.slash_command(guild_ids=guild_list)
 async def reload(ctx: discord.ApplicationContext, extension: Option(str, description="Extension to reload.")):
@@ -70,6 +72,7 @@ async def reload(ctx: discord.ApplicationContext, extension: Option(str, descrip
 
     bot.reload_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Reloaded {extension}.')
+    log("debug", __name__, f"{ctx.author.name} reloaded {extension}.")
 
 @bot.slash_command(guild_ids=guild_list)
 async def reloadall(ctx: discord.ApplicationContext):
@@ -88,30 +91,41 @@ async def reloadall(ctx: discord.ApplicationContext):
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
 
-            cog_status[filename[:-3]] = None
+            cog_name = filename[:-3]
+            cog_status[cog_name] = None
 
             try:
-                bot.unload_extension(f'cogs.{filename[:-3]}')
-                cog_status[filename[:-3]] = f'`[SUCCESS] {filename[:-3]}: Unloaded`'
+                bot.unload_extension(f'cogs.{cog_name}')
+                cog_status[cog_name] = f'`[SUCCESS] {cog_name}: Unloaded`'
             except Exception as e:
-                cog_status[filename[:-3]] = f'`[ERROR] {filename[:-3]}: {type(e)}`'
+                cog_status[cog_name] = f'`[ERROR] {cog_name}: {type(e)}`'
 
             try:
-                bot.load_extension(f'cogs.{filename[:-3]}')
-                cog_status[filename[:-3]] = f'`[SUCCESS] {filename[:-3]}: Loaded`'
+                bot.load_extension(f'cogs.{cog_name}')
+                cog_status[cog_name] = f'`[SUCCESS] {cog_name}: Loaded`'
             except Exception as e:
-                cog_status[filename[:-3]] = f'`[ERROR] {filename[:-3]}: {type(e)}`'
+                cog_status[cog_name] = f'`[ERROR] {cog_name}: {type(e)}`'
 
-    msg = Embed(title=f"Reload All Cogs", color=EMBED_COLOR, timestamp=datetime.datetime)
+    msg = Embed(title=f"Reload All Cogs", color=EMBED_COLOR, timestamp=datetime.datetime.utcnow())
     msg.set_author(name="ARC Assistant", icon_url=ARC_ICON_URL)
     msg.description = "\n".join((f'{cog}: {cog_status[cog]}' for cog in cog_status))
-    msg.set_footer(text=f"Requested by: {ctx.author.name}", icon_url=ctx.author.avatar_url)
+    msg.set_footer(text=f"Requested by: {ctx.author.name}", icon_url=ctx.author.display_avatar)
 
     await ctx.response.send_message(embed=msg)
+    log("debug", __name__, f"{ctx.author.name} reloaded all cogs.")
+
+@bot.event
+async def on_error(ctx, error):
+    pass
 
 # Logging takes place in individual cogs
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
+
+def atExitHandler():
+    log("fatal", __name__, "sum ting wong")
+
+atexit.register(atExitHandler)
 
 bot.run(os.getenv('BOT_TOKEN'))

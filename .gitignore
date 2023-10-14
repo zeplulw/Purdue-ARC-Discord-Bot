@@ -1,5 +1,6 @@
 # Project-specific rules
 db.json
+log.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
