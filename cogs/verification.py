@@ -6,11 +6,11 @@ import datetime
 from discord.ext import commands
 from discord import Option
 from modal import VerificationModal
-from logger import log
+from logger import Logger
+from main import guild_list
 
 dotenv.load_dotenv()
-
-guild_list = os.getenv('GUILD_LIST').split(',')
+log = Logger().log
 
 def getCurrentTime() -> str:
     return datetime.datetime.now().isoformat()
@@ -54,18 +54,18 @@ class Verification(commands.Cog):
             await ctx.response.send_message(content=f"Welcome to ARC! You are now verified.")
 
 def setup(bot):
-    log("info", __name__, f"Loading {os.path.basename(__file__)} cog.")
+    log("trace", __name__, f"Loading {os.path.basename(__file__)} cog.")
     try:
         bot.add_cog(Verification(bot))
-        log("info", __name__, f"Loaded {os.path.basename(__file__)} cog.")
+        log("debug", __name__, f"Loaded {os.path.basename(__file__)} cog.")
     except Exception as e:
         log("error", __name__, f"Failed to load {os.path.basename(__file__)} cog.")
 
 def teardown(bot):
-    log("info", __name__, f"Unloading {os.path.basename(__file__)} cog.")
+    log("trace", __name__, f"Unloading {os.path.basename(__file__)} cog.")
     try:
         bot.remove_cog(Verification(bot))
-        log("info", __name__, f"Unloaded {os.path.basename(__file__)} cog.")
+        log("debug", __name__, f"Unloaded {os.path.basename(__file__)} cog.")
     except Exception as e:
         log("error", __name__, f"Failed to unload {os.path.basename(__file__)} cog.")
     

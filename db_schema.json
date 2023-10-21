@@ -2,10 +2,163 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
+    "options": {
+      "type": "object",
+      "properties": {
+        "guildList": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "embedColor": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{6}$"
+        },
+        "arcIconURL": {
+          "type": "string"
+        },
+        "printLogMessages": {
+          "type": "boolean"
+        },
+        "permissionList": {
+          "type": "object",
+          "properties": {
+            "reload": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "role": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "kick": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ban": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mute": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "warn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "purge": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "defaultMuteTime": {
+          "type": "integer"
+        },
+        "muteRoleId": {
+          "type": "string",
+          "pattern": "^[0-9]{17,19}$"
+        },
+        "spamLimit": {
+          "type": "integer"
+        },
+        "bannedWords": {
+          "type": "array"
+        },
+        "auditChannelId": {
+          "type": "string",
+          "pattern": "^[0-9]{17,19}$"
+        }
+      },
+      "required": ["guildList", "embedColor", "arcIconURL", "printLogMessages", "permissionList", "defaultMuteTime", "muteRoleId", "spamLimit", "bannedWords", "auditChannelId"]
+    },
+    "muteList": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]{17,19}$": {
+          "type": "object",
+          "properties": {
+            "muteHistory": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "muteStart": {
+                    "type": "number"
+                  },
+                  "muteEnd": {
+                    "type": "number"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": ["muteStart", "muteEnd", "reason"]
+              }
+            },
+            "muted": {
+              "type": "boolean"
+            },
+            "muteStart": {
+              "type": "number"
+            },
+            "muteEnd": {
+              "type": "number"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": ["muteHistory", "muted", "muteStart", "muteEnd", "reason"]
+        }
+      }
+    },
+    "warnList": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]{17,19}$": {
+          "type": "object",
+          "properties": {
+            "warns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "number"
+                  }
+                },
+                "required": ["reason", "time"]
+              }
+            }
+          },
+          "required": ["warns"]
+        }
+      }
+    },
     "emailVerification": {
       "type": "object",
       "patternProperties": {
-        "^[0-9]{17,18}$": {
+        "^[0-9]{17,19}$": {
           "type": "object",
           "properties": {
             "email": {
@@ -21,19 +174,9 @@
               "maximum": 999999
             }
           },
-          "required": [
-            "email",
-            "verified",
-            "verificationCode"
-          ],
-          "additionalProperties": false
+          "required": ["email", "verified", "verificationCode"]
         }
-      },
-      "additionalProperties": false
+      }
     }
-  },
-  "required": [
-    "emailVerification" 
-  ],
-  "additionalProperties": false
+  }
 }
