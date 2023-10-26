@@ -23,20 +23,32 @@ with open("db.json", "r") as f:
     EMBED_COLOR = int(options["embedColor"], 16)
     ARC_ICON_URL = options["arcIconURL"]
 
-cog_list = [filename[:-3] for filename in os.listdir('./cogs') if filename.endswith('.py')]
+cog_list = [filename[:-3]
+            for filename in os.listdir('./cogs') if filename.endswith('.py')]
 
 # @TODO: add detection for disconnect (i dont think this is possible with stock py-cord) (MONITORING); add disconnect to log (LOGGING)
+
+
 @bot.event
 async def on_ready():
-    log("info", __name__, f"{bot.user} has logged in and is connected to Discord.", important=True)
+    log("info",
+        __name__,
+        f"{bot.user} has logged in and is connected to Discord.",
+        important=True)
+
 
 @bot.slash_command(guild_ids=guild_list)
-@commands.check_any(commands.is_owner(), commands.has_any_role(*permissionList["reload"]))
-@discord.option("extension", type=str, description="Extension to load.", choices=cog_list, required=True)
+@commands.check_any(commands.is_owner(),
+                    commands.has_any_role(*permissionList["reload"]))
+@discord.option("extension",
+                type=str,
+                description="Extension to load.",
+                choices=cog_list,
+                required=True)
 async def load(
-        ctx: discord.ApplicationContext,
-        extension: str
-    ):
+    ctx: discord.ApplicationContext,
+    extension: str
+):
 
     """
     Load a cog.
@@ -51,15 +63,22 @@ async def load(
     # TODO: add check for if cog is already loaded (GLOBAL ERROR HANDLER)
     bot.load_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Loaded {extension}.')
-    log("debug", __name__, f"{ctx.author.name} loaded {extension}.")
+    log("debug", __name__,
+        f"{ctx.author.name}({ctx.author.id}) loaded {extension}.")
+
 
 @bot.slash_command(guild_ids=guild_list)
-@commands.check_any(commands.is_owner(), commands.has_any_role(*permissionList["reload"]))
-@discord.option("extension", type=str, description="Extension to unload.", choices=cog_list, required=True)
+@commands.check_any(commands.is_owner(),
+                    commands.has_any_role(*permissionList["reload"]))
+@discord.option("extension",
+                type=str,
+                description="Extension to unload.",
+                choices=cog_list,
+                required=True)
 async def unload(
-        ctx: discord.ApplicationContext,
-        extension: str
-    ):
+    ctx: discord.ApplicationContext,
+    extension: str
+):
 
     """
     Unloads a cog.
@@ -73,15 +92,21 @@ async def unload(
 
     bot.unload_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Unloaded {extension}.')
-    log("debug", __name__, f"{ctx.author.name} unloaded {extension}.")
+    log("debug", __name__,
+        f"{ctx.author.name}({ctx.author.id}) unloaded {extension}.")
+
 
 @bot.slash_command(guild_ids=guild_list)
 @commands.check_any(commands.has_any_role(*permissionList["reload"]))
-@discord.option("extension", type=str, description="Extension to reload.", choices=cog_list, required=True)
+@discord.option("extension",
+                type=str,
+                description="Extension to reload.",
+                choices=cog_list,
+                required=True)
 async def reload(
-        ctx: discord.ApplicationContext,
-        extension: str
-    ):
+    ctx: discord.ApplicationContext,
+    extension: str
+):
 
     """
     Reloads a cog. Equal to unload and load.
@@ -95,10 +120,13 @@ async def reload(
 
     bot.reload_extension(f'cogs.{extension}')
     await ctx.response.send_message(content=f'Reloaded {extension}.')
-    log("info", __name__, f"{ctx.author.name} reloaded {extension}.")
+    log("debug", __name__,
+        f"{ctx.author.name}({ctx.author.id}) reloaded {extension}.")
+
 
 @bot.slash_command(guild_ids=guild_list)
-@commands.check_any(commands.is_owner(), commands.has_any_role(*permissionList["reload"]))
+@commands.check_any(commands.is_owner(),
+                    commands.has_any_role(*permissionList["reload"]))
 async def reloadall(ctx: discord.ApplicationContext):
 
     """
@@ -124,21 +152,51 @@ async def reloadall(ctx: discord.ApplicationContext):
                 cog_status.append(f"`{cog_name}: ❌ (see log)`")
                 log("error", __name__, f"Failed to reload {cog_name}: {e}")
 
-    msg = Embed(title=f"Reload All Cogs", color=EMBED_COLOR, timestamp=datetime.datetime.utcnow())
+    msg = Embed(
+        title=f"Reload All Cogs",
+        color=EMBED_COLOR,
+        timestamp=datetime.datetime.utcnow())
     msg.set_author(name="ARC Assistant", icon_url=ARC_ICON_URL)
     msg.description = "\n".join(cog_status)
-    msg.set_footer(text=f"Requested by: {ctx.author.name}", icon_url=ctx.author.display_avatar)
+    msg.set_footer(
+        text=f"Requested by: {ctx.author.name}",
+        icon_url=ctx.author.display_avatar)
 
     await ctx.response.send_message(embed=msg)
-    log("info", __name__, f"{ctx.author.name} reloaded all cogs.")
+    log("info", __name__,
+        f"{ctx.author.name}({ctx.author.id}) reloaded all cogs.")
+
+
+@bot.slash_command(guild_ids=guild_list)
+@commands.check_any(commands.is_owner())
+async def getdb(ctx: discord.ApplicationContext):
+
+    """
+    Gets the database.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    await ctx.author.send(file=discord.File("db.json"))
+
+    await ctx.response.send_message("Sent file to DMs.")
+    log("info", __name__,
+        f"{ctx.author.name}({ctx.author.id}) requested the database.")
+
 
 # Logging of cog loading takes place in individual cogs
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
+
 @atexit.register
 def atExitHandler():
     log("info", __name__, "Bot exited.", important=True)
+
 
 bot.run(os.getenv('BOT_TOKEN'))

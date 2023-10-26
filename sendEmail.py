@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 
 dotenv.load_dotenv()
 
+
 class EmailSender:
     def __init__(self, sender_email: str, sender_password: str):
         self.sender_email = sender_email
@@ -25,8 +26,13 @@ class EmailSender:
     #         smtp.login(self.sender_email, self.sender_password)
     #         smtp.sendmail(self.sender_email, receiver, msg.as_string())
 
-    def send_verification_email(self, *, username: str, receiver: str, verification_code: str, subject: str ='Purdue ARC Verification') -> None:
-        
+    def send_verification_email(
+            self,
+            *,
+            username: str,
+            receiver: str,
+            verification_code: str,
+            subject: str = 'Purdue ARC Verification') -> None:
         """
         Send an email.
 
@@ -35,7 +41,7 @@ class EmailSender:
             receiver (str): The email address of the recipient.
             verification_code (int): The body of the email message.
             subject (str, optional): The subject of the email (default is "Purdue ARC Verification").
-        
+
         Returns:
             None
         """
@@ -123,7 +129,7 @@ class EmailSender:
             </body>
         </html>
         """
-      
+
         msg = MIMEMultipart()
         msg['From'] = self.sender_email
         msg['To'] = receiver
