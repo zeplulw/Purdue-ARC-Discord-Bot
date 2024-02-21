@@ -71,4 +71,4 @@ class VerificationModal(Modal):
         with open("db.json", "w") as f:
             json.dump(data, f, indent=4)
 
-        await interaction.edit_original_response(content=f"Please check your email for a verification code and instructions. If you do not see an email from `admin@benlima.dev`, please check your spam folder")
+        await interaction.edit_original_response(content=f"Please check your email for a verification code and instructions. If you do not see an email from `{os.getenv('EMAIL_ADDRESS')}`, please check your spam folder")

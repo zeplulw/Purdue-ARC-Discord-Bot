@@ -181,9 +181,9 @@ async def getdb(ctx: discord.ApplicationContext):
         None
     """
 
-    await ctx.author.send(file=discord.File("db.json"))
+    msg = await ctx.author.send(file=discord.File("db.json"))
 
-    await ctx.response.send_message("Sent file to DMs.")
+    await ctx.response.send_message(f"[Sent file to DMs.]({msg.jump_url})")
     log("info", __name__,
         f"{ctx.author.name}({ctx.author.id}) requested the database.")
 
